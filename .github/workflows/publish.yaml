@@ -9,9 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: entity_gym
     strategy:
       matrix:
         python-version: [3.8]
