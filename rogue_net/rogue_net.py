@@ -7,13 +7,6 @@ import numpy.typing as npt
 import torch
 import torch.nn as nn
 import torch_scatter
-from ragged_buffer import (
-    RaggedBuffer,
-    RaggedBufferBool,
-    RaggedBufferF32,
-    RaggedBufferI64,
-)
-
 from entity_gym.env import ActionSpace, ObsSpace, VecActionMask
 from entity_gym.env.environment import (
     CategoricalActionSpace,
@@ -22,6 +15,13 @@ from entity_gym.env.environment import (
     SelectEntityActionSpace,
 )
 from entity_gym.simple_trace import Tracer
+from ragged_buffer import (
+    RaggedBuffer,
+    RaggedBufferBool,
+    RaggedBufferF32,
+    RaggedBufferI64,
+)
+
 from rogue_net.categorical_action_head import CategoricalActionHead
 from rogue_net.embedding import EntityEmbedding
 from rogue_net.ragged_tensor import RaggedTensor

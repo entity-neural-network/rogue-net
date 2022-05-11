@@ -3,11 +3,11 @@ from typing import Dict, Mapping, Optional, Tuple
 import numpy as np
 import ragged_buffer
 import torch
+from entity_gym.env import ObsSpace
+from entity_gym.simple_trace import Tracer
 from ragged_buffer import RaggedBufferF32, RaggedBufferI64
 from torch import nn
 
-from entity_gym.env import ObsSpace
-from entity_gym.simple_trace import Tracer
 from rogue_net.input_norm import InputNorm
 from rogue_net.translate_positions import TranslatePositions, TranslationConfig
 

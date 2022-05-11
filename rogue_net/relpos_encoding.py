@@ -5,9 +5,9 @@ from typing import List, Literal, Mapping, Optional, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from entity_gym.env import ObsSpace
 from ragged_buffer import RaggedBufferI64
 
-from entity_gym.env import ObsSpace
 from rogue_net.input_norm import InputNorm
 
 

@@ -3,11 +3,11 @@ from typing import Optional, Tuple
 import numpy as np
 import numpy.typing as npt
 import torch
+from entity_gym.env import VecActionMask, VecCategoricalActionMask
 from ragged_buffer import RaggedBufferI64
 from torch import nn
 from torch.distributions.categorical import Categorical
 
-from entity_gym.env import VecActionMask, VecCategoricalActionMask
 from rogue_net.ragged_tensor import RaggedTensor
 
 

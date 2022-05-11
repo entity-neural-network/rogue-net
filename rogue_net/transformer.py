@@ -6,10 +6,10 @@ from typing import Literal, Mapping, Optional, Tuple, Union
 import torch
 import torch.nn as nn
 import torch_scatter
+from entity_gym.env.environment import ObsSpace
 from ragged_buffer import RaggedBufferI64
 from torch.nn import functional as F
 
-from entity_gym.env.environment import ObsSpace
 from rogue_net.relpos_encoding import RelposEncoding, RelposEncodingConfig
 
 logger = logging.getLogger(__name__)

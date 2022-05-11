@@ -1,8 +1,8 @@
 import numpy as np
 import torch
+from entity_gym.env import VecCategoricalActionMask
 from ragged_buffer import RaggedBufferI64
 
-from entity_gym.env import VecCategoricalActionMask
 from rogue_net.categorical_action_head import CategoricalActionHead
 from rogue_net.ragged_tensor import RaggedTensor
 

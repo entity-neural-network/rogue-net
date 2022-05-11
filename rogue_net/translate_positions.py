@@ -4,9 +4,8 @@ from typing import Dict, List, Optional
 
 import numpy as np
 import ragged_buffer
-from ragged_buffer import RaggedBufferF32
-
 from entity_gym.env import ObsSpace
+from ragged_buffer import RaggedBufferF32
 
 
 @dataclass
