@@ -15,20 +15,19 @@ from rogue_net.input_norm import InputNorm
 class RelposEncodingConfig:
     """Settings for relative position encoding.
 
-    Attributes:
-        extent: Each integer relative position in the interval [-extent, extent] receives a positional embedding, with positions outside the interval snapped to the closest end.
-        position_features: Names of position features used for relative position encoding.
-        scale: Relative positions are divided by the scale before being assigned an embedding.
-        per_entity_values: Whether to use per-entity embeddings for relative positional values.
-        exclude_entities: List of entity types to exclude from relative position encoding.
-        key_relpos_projection: Adds a learnable projection from the relative position/distance to the relative positional keys.
-        value_relpos_projection: Adds a learnable projection from the relative position/distance to the relative positional values.
-        per_entity_projections: Uses a different learned projection per entity type for the `key_relpos_projection` and `value_relpos_projection`.
-        radial: Buckets all relative positions by their angle. The `extent` is interpreted as the number of buckets.
-        distance: Buckets all relative positions by their distance. The `extent` is interpreted as the number of buckets.
-        rotation_vec_features: Name of features that give a unit orientation vector for each entity by which to rotate relative positions.
-        rotation_angle_feature: Name of feature that gives an angle in radians by which to rotate relative positions.
-        interpolate: Whether to interpolate between the embeddings of neighboring positions.
+    :param extent: Each integer relative position in the interval [-extent, extent] receives a positional embedding, with positions outside the interval snapped to the closest end.
+    :param position_features: Names of position features used for relative position encoding.
+    :param scale: Relative positions are divided by the scale before being assigned an embedding.
+    :param per_entity_values: Whether to use per-entity embeddings for relative positional values.
+    :param exclude_entities: List of entity types to exclude from relative position encoding.
+    :param key_relpos_projection: Adds a learnable projection from the relative position/distance to the relative positional keys.
+    :param value_relpos_projection: Adds a learnable projection from the relative position/distance to the relative positional values.
+    :param per_entity_projections: Uses a different learned projection per entity type for the `key_relpos_projection` and `value_relpos_projection`.
+    :param radial: Buckets all relative positions by their angle. The `extent` is interpreted as the number of buckets.
+    :param distance: Buckets all relative positions by their distance. The `extent` is interpreted as the number of buckets.
+    :param rotation_vec_features: Name of features that give a unit orientation vector for each entity by which to rotate relative positions.
+    :param rotation_angle_feature: Name of feature that gives an angle in radians by which to rotate relative positions.
+    :param interpolate: Whether to interpolate between the embeddings of neighboring positions.
     """
 
     extent: List[int]
