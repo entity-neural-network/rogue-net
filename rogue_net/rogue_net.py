@@ -50,6 +50,14 @@ def tensor_dict_to_ragged(
 class RogueNetConfig(TransformerConfig):
     """RogueNet network parameters.
 
+    :param embd_pdrop: Dropout probability for embedding layer.
+    :param resid_pdrop: Dropout probability for residual branches.
+    :param attn_pdrop: Dropout probability for attention.
+    :param n_layer: Number of transformer layers.
+    :param n_head: Number of attention heads.
+    :param d_model: Dimension of embedding.
+    :param pooling: Replace attention layer with ``"mean"``, ``"max"``, or ``"meanmax"`` pooling.
+    :param relpos_encoding: Relative positional encoding settings.
     :param d_qk: Dimension of keys and queries in select-entity action heads.
     :param translation: Settings for transforming all position features to be centered on one entity..
     """
