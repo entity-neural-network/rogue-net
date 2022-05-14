@@ -105,7 +105,7 @@ class PaddedSelectEntityActionHead(nn.Module):
             action = dist.sample()
         else:
             action = torch.tensor(prev_actions.as_array(), device=device).flatten()
-            padded_actions = torch.ones(
+            padded_actions = torch.zeros(
                 (logits.size(0) * logits.size(1)), dtype=torch.long, device=device
             )
             padded_actions[qindices] = action
