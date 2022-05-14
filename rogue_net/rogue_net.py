@@ -50,9 +50,8 @@ def tensor_dict_to_ragged(
 class RogueNetConfig(TransformerConfig):
     """RogueNet network parameters.
 
-    Attributes:
-        d_qk: dimension of keys and queries in select-entity action heads
-        translation: settings for transforming all position features to be centered on one entity
+    :param d_qk: Dimension of keys and queries in select-entity action heads.
+    :param translation: Settings for transforming all position features to be centered on one entity..
     """
 
     d_qk: int = 16

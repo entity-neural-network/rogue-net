@@ -19,15 +19,14 @@ logger = logging.getLogger(__name__)
 class TransformerConfig:
     """Transformer network hyperparameters.
 
-    Attributes:
-        embd_pdrop: Dropout probability for embedding layer.
-        resid_pdrop: Dropout probability for residual branches.
-        attn_pdrop: Dropout probability for attention.
-        n_layer: Number of transformer layers.
-        n_head: Number of attention heads.
-        d_model: Dimension of embedding.
-        pooling: Replace attention with "mean", "max", or "meanmax" pooling.
-        relpos_encoding: Relative positional encoding settings.
+    :param embd_pdrop: Dropout probability for embedding layer.
+    :param resid_pdrop: Dropout probability for residual branches.
+    :param attn_pdrop: Dropout probability for attention.
+    :param n_layer: Number of transformer layers.
+    :param n_head: Number of attention heads.
+    :param d_model: Dimension of embedding.
+    :param pooling: Replace attention layer with ``"mean"``, ``"max"``, or ``"meanmax"`` pooling.
+    :param relpos_encoding: Relative positional encoding settings.
     """
 
     embd_pdrop: float = 0.0
