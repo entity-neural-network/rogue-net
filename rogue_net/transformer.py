@@ -32,9 +32,9 @@ class TransformerConfig:
     embd_pdrop: float = 0.0
     resid_pdrop: float = 0.0
     attn_pdrop: float = 0.0
-    n_layer: int = 1
+    n_layer: int = 2
     n_head: int = 2
-    d_model: int = 64
+    d_model: int = 32
     pooling: Optional[Literal["mean", "max", "meanmax"]] = None
     relpos_encoding: Optional[RelposEncodingConfig] = None
 
