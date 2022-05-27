@@ -117,5 +117,5 @@ class PaddedSelectEntityActionHead(nn.Module):
             actor_lengths,
             logprob.flatten()[qindices],
             entropy.flatten()[qindices],
-            logits,
+            dist.logits,
         )
