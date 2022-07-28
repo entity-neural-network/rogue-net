@@ -1,6 +1,6 @@
 import dataclasses
 from dataclasses import dataclass
-from typing import Dict, Mapping, Optional, Tuple, Type, TypeVar
+from typing import Dict, List, Mapping, Optional, Tuple, Type, TypeVar
 
 import numpy as np
 import numpy.typing as npt
@@ -106,6 +106,8 @@ class RogueNet(nn.Module):
             else None
         )
 
+        self.obs_filter: Dict[str, npt.NDArray[np.int64]] = {}
+
     def device(self) -> torch.device:
         return next(self.parameters()).device
 
@@ -118,7 +120,9 @@ class RogueNet(nn.Module):
         with tracer.span("embedding"):
             # Ensure consistent dictionary ordering
             entities = {
-                name: entities[name]
+                name: entities[name][:, :, self.obs_filter[name]]  # type: ignore
+                if name in self.obs_filter
+                else entities[name]
                 for name in list(self.obs_space.entities.keys()) + ["__global__"]
                 if name in entities
             }
@@ -261,6 +265,38 @@ class RogueNet(nn.Module):
             auxiliary_values,
             logits,
         )
+
+    def set_obs_filter(self, obs_space: ObsSpace) -> None:
+        self.obs_filter = {}
+        if obs_space == self.obs_space:
+            return
+        for key, entity in self.obs_space.entities.items():
+            if key not in obs_space.entities:
+                raise ValueError(f"Missing entity {key} in obs space")
+            expected_feats = entity.features
+            received_feats = obs_space.entities[key].features
+            if expected_feats != received_feats:
+                self.obs_filter[key] = construct_obs_filter(
+                    expected_feats, received_feats
+                )
+        if self.obs_space.global_features != obs_space.global_features:
+            self.obs_filter["__global__"] = construct_obs_filter(
+                self.obs_space.global_features, obs_space.global_features
+            )
+
+
+def construct_obs_filter(
+    expected_features: List[str], received_feats: List[str]
+) -> npt.NDArray[np.int64]:
+    # Ensure that all expected features are present with efficient set intersection
+    missing_features = set(expected_features) - set(received_feats)
+    if missing_features:
+        raise ValueError(f"Missing features: {missing_features}. ")
+    # Construct indices to select features from the received features
+    indices = []
+    for feat in expected_features:
+        indices.append(received_feats.index(feat))
+    return np.array(indices, dtype=np.int64)
 
 
 def regression_head(d_model: int, d_out: int) -> nn.Module:
