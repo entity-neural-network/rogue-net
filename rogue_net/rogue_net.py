@@ -86,6 +86,7 @@ class RogueNet(nn.Module):
         if any(
             isinstance(a, GlobalCategoricalActionSpace) for a in action_space.values()
         ):
+            _obs_space.entities = {k: v for k, v in _obs_space.entities.items()}
             _obs_space.entities["__global__"] = Entity(features=global_features)
 
         self.d_model = cfg.d_model
