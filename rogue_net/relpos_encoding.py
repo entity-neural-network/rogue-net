@@ -44,6 +44,7 @@ class RelposEncodingConfig:
     rotation_angle_feature: Optional[str] = None
     interpolate: bool = False
     value_gate: Literal["linear", "relu", "gelu", "sigmoid", None] = "relu"
+    enable_negative_distance_weight_bug: bool = False
 
     def __post_init__(self) -> None:
         if self.radial and self.distance:
@@ -479,7 +480,10 @@ class RelposEncoding(nn.Module, RelposEncodingConfig):
             index1 + 1,
             self.extent_tensor[0, 0, 0, -1] - 1,  # type: ignore
         )
-        weight1 = index2 - distances
+        if self.enable_negative_distance_weight_bug:
+            weight1 = index2 - distances
+        else:
+            weight1 = torch.clamp(index2 - distances, 0.0)
         weight2 = 1.0 - weight1
         return [(index1, weight1), (index2, weight2)]
 
