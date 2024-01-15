@@ -12,19 +12,13 @@ from torch.distributions.beta import Beta
 from rogue_net.ragged_tensor import RaggedTensor
 
 
-class CategoricalActionHead(nn.Module):
+class ContinuousActionHead(nn.Module):
     def __init__(self, d_model: int, n_choice: int) -> None:
         super().__init__()
-        
-        self.beta = False
 
         self.d_model = d_model
-        if self.beta:
-            self.n_choice = 2
-            self.proj = layer_init(nn.Linear(d_model, 2), std=0.01)
-        else:
-            self.n_choice = n_choice       
-            self.proj = layer_init(nn.Linear(d_model, n_choice), std=0.01)
+        self.n_choice = 2
+        self.proj = layer_init(nn.Linear(d_model, 2), std=0.01)
 
     def forward(
         self,
@@ -64,45 +58,25 @@ class CategoricalActionHead(nn.Module):
                 mask.mask.as_array().reshape(logits.shape)
             ).to(x.data.device)
         
-        beta_flag = self.beta
-        scaler = np.iinfo(np.int64).max
+        logits = (logits ** 2 + 1).to('cpu')
+        dist = Beta(logits[:,0],logits[:,1])
 
-        if beta_flag:
-            logits = (logits ** 2 + 1).to('cpu')
-            dist = Beta(logits[:,0],logits[:,1])
-        else:
-            dist = Categorical(logits=logits)
-        
         if prev_actions is None:
-            if beta_flag:
-                action = dist.rsample()
-            else:
-                action = dist.sample()
+            action = dist.rsample()
         else:
-            if beta_flag:
-                action = torch.tensor(prev_actions.as_array().squeeze(-1)).to('cpu') / scaler
-            else:
-                action = torch.tensor(prev_actions.as_array().squeeze(-1)).to(x.data.device)
-#        print(action)
-        #logprob = dist.log_prob(action)
-        if beta_flag:
-            logprob = torch.zeros_like(action).to('cpu')
-            for i in range(action.shape[0]):
-                logprob[i] = dist.log_prob(action[i])[i]
-            logprob = logprob.to(x.data.device)
-        else:
-            logprob = dist.log_prob(action)
+            action = torch.tensor(prev_actions.as_array().squeeze(-1)).to('cpu') / np.iinfo(np.int64).max
+        
+        # Would be good to find a
+        logprob = torch.zeros_like(action).to('cpu')
+        for i in range(action.shape[0]):
+            logprob[i] = dist.log_prob(action[i])[i]
+        logprob = logprob.to(x.data.device)
+        
         entropy = dist.entropy()
-        #logprob =  torch.zeros(action.shape)
-        #entropy =  torch.zeros(action.shape)
-
-        if beta_flag:
-            return_logits = logits.to(x.data.device)
-            action_return = action * scaler
-            action_return = action_return.to(torch.int64).to(x.data.device)
-        else:
-            action_return = action
-            return_logits = dist.logits
+        
+        return_logits = logits.to(x.data.device)
+        action_return = action * np.iinfo(np.int64).max
+        action_return = action_return.to(torch.int64).to(x.data.device)
 
         return action_return, lengths, logprob, entropy, return_logits 
 
