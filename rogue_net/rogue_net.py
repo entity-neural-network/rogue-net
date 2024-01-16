@@ -13,6 +13,7 @@ from entity_gym.env.environment import (
     Entity,
     GlobalCategoricalActionSpace,
     SelectEntityActionSpace,
+    ContinuousActionSpace,
 )
 from entity_gym.simple_trace import Tracer
 from ragged_buffer import (
@@ -28,6 +29,7 @@ from rogue_net.ragged_tensor import RaggedTensor
 from rogue_net.select_entity_action_head import PaddedSelectEntityActionHead
 from rogue_net.transformer import Transformer, TransformerConfig
 from rogue_net.translate_positions import TranslationConfig
+from rogue_net.continuous_action_head import ContinuousActionHead
 
 ScalarType = TypeVar("ScalarType", bound=np.generic, covariant=True)
 
@@ -318,6 +320,8 @@ def create_action_heads(
             action_heads[name] = CategoricalActionHead(d_model, len(space))
         elif isinstance(space, SelectEntityActionSpace):
             action_heads[name] = PaddedSelectEntityActionHead(d_model, d_qk)
+        elif isinstance(space, ContinuousActionSpace):
+            action_heads[name] = ContinuousActionHead(d_model, len(space))
         else:
             raise ValueError(f"Unknown action space {space}")
     return nn.ModuleDict(action_heads)
