@@ -7,7 +7,6 @@ from entity_gym.env import VecActionMask, VecCategoricalActionMask
 from ragged_buffer import RaggedBufferI64
 from torch import nn
 from torch.distributions.categorical import Categorical
-from torch.distributions.beta import Beta
 
 from rogue_net.ragged_tensor import RaggedTensor
 
@@ -15,16 +14,9 @@ from rogue_net.ragged_tensor import RaggedTensor
 class CategoricalActionHead(nn.Module):
     def __init__(self, d_model: int, n_choice: int) -> None:
         super().__init__()
-        
-        self.beta = False
-
         self.d_model = d_model
-        if self.beta:
-            self.n_choice = 2
-            self.proj = layer_init(nn.Linear(d_model, 2), std=0.01)
-        else:
-            self.n_choice = n_choice       
-            self.proj = layer_init(nn.Linear(d_model, n_choice), std=0.01)
+        self.n_choice = n_choice
+        self.proj = layer_init(nn.Linear(d_model, n_choice), std=0.01)
 
     def forward(
         self,
@@ -63,49 +55,16 @@ class CategoricalActionHead(nn.Module):
             reshaped_masks = torch.tensor(
                 mask.mask.as_array().reshape(logits.shape)
             ).to(x.data.device)
-        
-        beta_flag = self.beta
-        scaler = np.iinfo(np.int64).max
+            logits = logits.masked_fill(reshaped_masks == 0, -float("inf"))
 
-        if beta_flag:
-            logits = (logits ** 2 + 1).to('cpu')
-            dist = Beta(logits[:,0],logits[:,1])
-        else:
-            dist = Categorical(logits=logits)
-        
+        dist = Categorical(logits=logits)
         if prev_actions is None:
-            if beta_flag:
-                action = dist.rsample()
-            else:
-                action = dist.sample()
+            action = dist.sample()
         else:
-            if beta_flag:
-                action = torch.tensor(prev_actions.as_array().squeeze(-1)).to('cpu') / scaler
-            else:
-                action = torch.tensor(prev_actions.as_array().squeeze(-1)).to(x.data.device)
-#        print(action)
-        #logprob = dist.log_prob(action)
-        if beta_flag:
-            logprob = torch.zeros_like(action).to('cpu')
-            for i in range(action.shape[0]):
-                logprob[i] = dist.log_prob(action[i])[i]
-            logprob = logprob.to(x.data.device)
-        else:
-            logprob = dist.log_prob(action)
+            action = torch.tensor(prev_actions.as_array().squeeze(-1)).to(x.data.device)
+        logprob = dist.log_prob(action)
         entropy = dist.entropy()
-        #logprob =  torch.zeros(action.shape)
-        #entropy =  torch.zeros(action.shape)
-
-        if beta_flag:
-            return_logits = logits.to(x.data.device)
-            action_return = action * scaler
-            action_return = action_return.to(torch.int64).to(x.data.device)
-        else:
-            action_return = action
-            return_logits = dist.logits
-
-        return action_return, lengths, logprob, entropy, return_logits 
-
+        return action, lengths, logprob, entropy, dist.logits
 
 
 def layer_init(
